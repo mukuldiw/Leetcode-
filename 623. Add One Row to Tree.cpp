@@ -2,6 +2,7 @@
 #include<queue>
 #include<vector>
 using namespace std;
+
 class node{
 	public:
 	int data;
@@ -65,43 +66,41 @@ void print(node* root){
 	print(root->left);
 	print(root->right);
 }
-
 int height(node* root){
-    if(!root)return 0;
-    int l = height(root->left);
-    int r = height(root->right);
-    return 1 + max(l,r);
+	if(!root)return 0;
+	return 1 + max(height(root->left),height(root->right));
 }
-void helper(node* root,int h,int &max_h,vector<int> &v){
+void helper(node* root,int val,int depth,int h,int max_h){
 	if(!root)return;
-	
-	h--;
-	helper(root->left,h,max_h,v);
-//	cout<<root->data<<" -> "<<h<<endl;
-	v[max_h - h-1] += root->data;
-	
-	helper(root->right,h,max_h,v);
-}
-int maxLevelSum(node* root){
-	int max_h = height(root);
-	vector<int> v(max_h,0);
-	cout<<max_h;
-	int res = INT_MIN,ans_h=1;
-	helper(root,max_h,max_h,v);
-	for(int i=0;i<v.size();i++){
-//		cout<<v[i]<<" ";
-		if(v[i] > res){
-			res = v[i];
-			ans_h = i+1;
-//			break;
-		}
+	h++;
+	helper(root->left,val,depth,h,max_h);
+	if(h == depth-1){
+		node* r = new node(val);
+		node* l = new node(val);
+		l->left = root->left;
+		r->right = root->right;
+		root->left = l;
+		root->right = r;
+		return;
 	}
-	return ans_h;
+//	cout<<root->data<<" -> "<<h<<endl;
+	helper(root->right,val,depth,h,max_h);
 }
-
+node* addOneRow(node* root,int val,int depth){
+	int h = 0;
+	int max_h = height(root);
+	
+	if(depth == 1){
+		node* r = new node(val);
+		r->left = root;
+		return r;
+	}
+	helper(root,val,depth,h,max_h);
+	return root;
+}
 int main(){
 	node* root = takeInputLevelWise();
-	print(root);
-	cout<<endl;
-	cout<<"Max Sum Height: "<<maxLevelSum(root);
+	int val = 1, depth = 2;
+	node* r = addOneRow(root,val,depth);
+	print(r);
 }

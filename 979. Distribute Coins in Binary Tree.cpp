@@ -66,42 +66,22 @@ void print(node* root){
 	print(root->right);
 }
 
-int height(node* root){
+int helper(node* root,int &res){
     if(!root)return 0;
-    int l = height(root->left);
-    int r = height(root->right);
-    return 1 + max(l,r);
+    int l = helper(root->left,res);
+    int r = helper(root->right,res);
+    res = res + abs(l) + abs(r);
+    return root->data + l + r -1;
 }
-void helper(node* root,int h,int &max_h,vector<int> &v){
-	if(!root)return;
-	
-	h--;
-	helper(root->left,h,max_h,v);
-//	cout<<root->data<<" -> "<<h<<endl;
-	v[max_h - h-1] += root->data;
-	
-	helper(root->right,h,max_h,v);
-}
-int maxLevelSum(node* root){
-	int max_h = height(root);
-	vector<int> v(max_h,0);
-	cout<<max_h;
-	int res = INT_MIN,ans_h=1;
-	helper(root,max_h,max_h,v);
-	for(int i=0;i<v.size();i++){
-//		cout<<v[i]<<" ";
-		if(v[i] > res){
-			res = v[i];
-			ans_h = i+1;
-//			break;
-		}
-	}
-	return ans_h;
+int distributeCoins(node* root) {
+    int res = 0;
+    helper(root,res);
+    return res;
 }
 
 int main(){
 	node* root = takeInputLevelWise();
 	print(root);
 	cout<<endl;
-	cout<<"Max Sum Height: "<<maxLevelSum(root);
+	cout<<"Moves to distribute Coin: "<<distributeCoins(root);
 }

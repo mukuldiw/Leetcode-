@@ -2,6 +2,7 @@
 #include<queue>
 #include<vector>
 using namespace std;
+
 class node{
 	public:
 	int data;
@@ -65,43 +66,35 @@ void print(node* root){
 	print(root->left);
 	print(root->right);
 }
-
-int height(node* root){
-    if(!root)return 0;
-    int l = height(root->left);
-    int r = height(root->right);
-    return 1 + max(l,r);
-}
-void helper(node* root,int h,int &max_h,vector<int> &v){
-	if(!root)return;
+int helper(node* root,map<int,int> &m){
+	if(!root)return 0;
 	
-	h--;
-	helper(root->left,h,max_h,v);
-//	cout<<root->data<<" -> "<<h<<endl;
-	v[max_h - h-1] += root->data;
+	int l = helper(root->left,m);
+	int r = helper(root->right,m);
+//	cout<<root->data<<" -> "<<l+r+root->data<<endl;
+	m[l+r+root->data]++;
+	return l + r + root->data;
+//	sum = sum + root->data;
 	
-	helper(root->right,h,max_h,v);
 }
-int maxLevelSum(node* root){
-	int max_h = height(root);
-	vector<int> v(max_h,0);
-	cout<<max_h;
-	int res = INT_MIN,ans_h=1;
-	helper(root,max_h,max_h,v);
-	for(int i=0;i<v.size();i++){
-//		cout<<v[i]<<" ";
-		if(v[i] > res){
-			res = v[i];
-			ans_h = i+1;
-//			break;
+void findFrequentTreeSum(node* root){
+	map<int,int> m;
+	helper(root,m);
+	map<int,int>::iterator it;
+	int sum = INT_MIN;
+	for(it = m.begin();it!=m.end();++it){
+		sum = max(sum,it->second);
+	}
+	vector<int> v;
+	for(it = m.begin();it!=m.end();++it){
+		if(it->second == sum){
+			v.push_back(it->first);
 		}
 	}
-	return ans_h;
+	for(int i=0;i<v.size();i++)cout<<v[i]<<" ";
 }
-
 int main(){
 	node* root = takeInputLevelWise();
 	print(root);
-	cout<<endl;
-	cout<<"Max Sum Height: "<<maxLevelSum(root);
+	findFrequentTreeSum(root);
 }

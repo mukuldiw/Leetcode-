@@ -2,6 +2,7 @@
 #include<queue>
 #include<vector>
 using namespace std;
+
 class node{
 	public:
 	int data;
@@ -66,42 +67,37 @@ void print(node* root){
 	print(root->right);
 }
 
-int height(node* root){
-    if(!root)return 0;
-    int l = height(root->left);
-    int r = height(root->right);
-    return 1 + max(l,r);
-}
-void helper(node* root,int h,int &max_h,vector<int> &v){
+void helper(node* root,string &s,vector<string> &v){
 	if(!root)return;
-	
-	h--;
-	helper(root->left,h,max_h,v);
-//	cout<<root->data<<" -> "<<h<<endl;
-	v[max_h - h-1] += root->data;
-	
-	helper(root->right,h,max_h,v);
-}
-int maxLevelSum(node* root){
-	int max_h = height(root);
-	vector<int> v(max_h,0);
-	cout<<max_h;
-	int res = INT_MIN,ans_h=1;
-	helper(root,max_h,max_h,v);
-	for(int i=0;i<v.size();i++){
-//		cout<<v[i]<<" ";
-		if(v[i] > res){
-			res = v[i];
-			ans_h = i+1;
-//			break;
-		}
+	char ch = root->data + 48;
+	s = s + ch;
+	if(!root->left && !root->right){
+//		v.push_back(path);
+		v.push_back(s);
+		s = s.substr(0,s.length()-1);
+//		s = "";
+		return;
 	}
-	return ans_h;
+	helper(root->left,s,v);
+//	s = s.substr(0,s.length()-1);
+	helper(root->right,s,v);
+	s = s.substr(0,s.length()-1);
 }
 
+int sumNumbers(node* root){
+	vector<string> v;
+	string x = "";
+	helper(root,x,v);
+	int sum = 0;
+	for(int i=0;i<v.size();i++){
+		stringstream ss(v[i]);
+		int t = 0;
+		ss >> t;
+		sum = sum + t;
+	}
+	return sum;
+}
 int main(){
 	node* root = takeInputLevelWise();
-	print(root);
-	cout<<endl;
-	cout<<"Max Sum Height: "<<maxLevelSum(root);
+	cout<<"Sum of all nodes: "<<sumNumbers(root);
 }
